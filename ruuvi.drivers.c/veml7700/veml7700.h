@@ -17,8 +17,8 @@
 
 /* TWI instance ID. */
 #define TWI_INSTANCE_ID                 1
-#define VEML700_SDL			NRF_GPIO_PIN_MAP(0,7)//
-#define VEML700_SDA			NRF_GPIO_PIN_MAP(0,8)//
+#define SCL_PIN			NRF_GPIO_PIN_MAP(0,7)//
+#define SDA_PIN			NRF_GPIO_PIN_MAP(0,8)//
 #define VEML7700_ADDR                   0x29U
 
 
@@ -30,7 +30,8 @@
  */
 int veml_config(uint8_t reg, uint8_t reg_lsb, uint8_t reg_msb);
 uint16_t veml_read_luminosity(uint8_t reg);
-void veml770_twi_init (void);
-
+void twi_init (void);
+void lis2dh12_init(void);
+void log_lis2dh12_sensors(void);
 
 #endif

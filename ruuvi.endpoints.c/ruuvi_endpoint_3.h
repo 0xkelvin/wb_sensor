@@ -8,6 +8,7 @@
 #ifndef RUUVI_ENDPOINT_3_H
 #define RUUVI_ENDPOINT_3_H
 #include "ruuvi_endpoints.h"
+#include <stdint.h>
 
 #define RUUVI_ENDPOINT_3_DESTINATION 0x03
 #define RUUVI_ENDPOINT_3_INVALID_DATA 0
@@ -34,9 +35,9 @@ typedef struct{
   float humidity_rh;
   float pressure_pa;
   float temperature_c;
-  float accelerationx_g;
-  float accelerationy_g;
-  float accelerationz_g;
+  int16_t accelerationx_g;
+  int16_t accelerationy_g;
+  int16_t accelerationz_g;
   float battery_v;
   float rec1_adc;
   float rec2_adc;

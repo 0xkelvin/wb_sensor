@@ -25,6 +25,9 @@
 #include "veml7700.h"
 #include "nrf_log.h"
 #include "ruuvi_interface_gpio.h"
+#include "lis2dh12.h"
+#include "lis2dh12_registers.h"
+
 #include <nrf_delay.h>
 RUUVI_PLATFORM_TIMER_ID_DEF(advertisement_timer);
 ruuvi_interface_communication_t channel;
@@ -41,6 +44,7 @@ static void task_advertisement_scheduler_task(void *p_event_data, uint16_t event
 {
   ruuvi_driver_status_t err_code = RUUVI_DRIVER_SUCCESS;
   // Update BLE data
+#if(ENABLE_Cal_Gpio_State)
   if(nrf_gpio_pin_read(WB_CAL_GPIO))
   {
     NRF_LOG_INFO("highxxx\r\n");
@@ -71,12 +75,13 @@ static void task_advertisement_scheduler_task(void *p_event_data, uint16_t event
     }
   }
   else
+ #endif
   {
       Rec2_adc.adc_v = nrf52832_adc_sample_AIN2();
       Rec1_adc.adc_v = nrf52832_adc_sample_AIN3();
       PM_ADC.adc_v = nrf52832_adc_sample_AIN6();
       if(APPLICATION_DATA_FORMAT == 3) { err_code |= task_advertisement_send_3(); }
-      snprintf(message, sizeof(message), "adv Rec2_adc:: %.3f Rec1_adc:: %.3f PM_ADC:: %.3f\r\n",Rec2_adc.adc_v,Rec1_adc.adc_v,PM_ADC.adc_v);
+      //snprintf(message, sizeof(message), "adv Rec2_adc:: %.3f Rec1_adc:: %.3f PM_ADC:: %.3f\r\n",Rec2_adc.adc_v,Rec1_adc.adc_v,PM_ADC.adc_v);
       ruuvi_platform_log(RUUVI_INTERFACE_LOG_INFO, message);
       ruuvi_platform_gpio_toggle(Blink_LED);
   }
@@ -101,6 +106,7 @@ ruuvi_driver_status_t task_advertisement_init(void)
   return err_code;
 }
 
+extern lis2dh12_sensor_buffer_t lis2dh12_data;
 ruuvi_driver_status_t task_advertisement_send_3(void)
 {
   ruuvi_driver_status_t err_code = RUUVI_DRIVER_SUCCESS;
@@ -124,11 +130,16 @@ ruuvi_driver_status_t task_advertisement_send_3(void)
   #endif
   #endif
   // end 
+  #if(!ADVERTISE_WITH_DUMMY_DATA)
+  #if (ADVERTISE_WITH_ACCELER)
+  log_lis2dh12_sensors();
+  #endif
+  #endif
   ruuvi_endpoint_3_data_t data;
-  data.accelerationx_g = acclereration.x_g;
-  data.accelerationy_g = acclereration.y_g;
-  data.accelerationz_g = acclereration.z_g;
-
+  data.accelerationx_g = lis2dh12_data.sensor.x;//acclereration.x_g;
+  data.accelerationy_g = lis2dh12_data.sensor.y;//acclereration.y_g;
+  data.accelerationz_g = lis2dh12_data.sensor.z;//acclereration.z_g;
+  snprintf(message, sizeof(message), "x:: %d  y:: %d z:: %d\r\n",data.accelerationx_g,data.accelerationy_g,data.accelerationz_g);
   data.rec1_adc = Rec1_adc.adc_v;
   data.rec2_adc = Rec2_adc.adc_v;
   data.pm_adc   = PM_ADC.adc_v;

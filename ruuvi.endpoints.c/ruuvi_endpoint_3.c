@@ -65,10 +65,15 @@ ruuvi_endpoint_status_t ruuvi_endpoint_3_encode(uint8_t* const buffer, const ruu
   }
 
   // acceleration
-  ruuvi_endpoint_3_encode_acceleration(&buffer[RUUVI_ENDPOINT_3_OFFSET_ACCELERATIONX_MSB], data->rec1_adc, invalid);
-  ruuvi_endpoint_3_encode_acceleration(&buffer[RUUVI_ENDPOINT_3_OFFSET_ACCELERATIONY_MSB], data->rec2_adc, invalid);
-  ruuvi_endpoint_3_encode_acceleration(&buffer[RUUVI_ENDPOINT_3_OFFSET_ACCELERATIONZ_MSB], data->pm_adc, invalid);
-
+  //ruuvi_endpoint_3_encode_acceleration(&buffer[RUUVI_ENDPOINT_3_OFFSET_ACCELERATIONX_MSB], data->rec1_adc, invalid);
+  buffer[RUUVI_ENDPOINT_3_OFFSET_ACCELERATIONX_MSB] = data->accelerationx_g>>8;
+  buffer[RUUVI_ENDPOINT_3_OFFSET_ACCELERATIONX_LSB] = data->accelerationx_g&0xFF;
+  //ruuvi_endpoint_3_encode_acceleration(&buffer[RUUVI_ENDPOINT_3_OFFSET_ACCELERATIONY_MSB], data->rec2_adc, invalid);
+  buffer[RUUVI_ENDPOINT_3_OFFSET_ACCELERATIONY_MSB] = data->accelerationy_g>>8;
+  buffer[RUUVI_ENDPOINT_3_OFFSET_ACCELERATIONY_LSB] = data->accelerationy_g&0xFF;
+  //ruuvi_endpoint_3_encode_acceleration(&buffer[RUUVI_ENDPOINT_3_OFFSET_ACCELERATIONZ_MSB], data->pm_adc, invalid);
+  buffer[RUUVI_ENDPOINT_3_OFFSET_ACCELERATIONZ_MSB] = data->accelerationz_g>>8;
+  buffer[RUUVI_ENDPOINT_3_OFFSET_ACCELERATIONZ_LSB] = data->accelerationz_g&0xFF;
   // voltage
   uint32_t voltage = (data->battery_v*1000);
   buffer[RUUVI_ENDPOINT_3_OFFSET_SUPERCAP_MSB] = voltage>>8;

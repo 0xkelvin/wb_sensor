@@ -5,6 +5,13 @@
 #include "nrf_drv_twi.h"
 #include "boards.h"
 #include "app_util_platform.h"
+#include "lis2dh12.h"
+#include "lis2dh12_registers.h"
+
+#define LIS2DH12_TWI_ADDR                     LIS2DH12_TWI_ADDR1
+#define LIS2DH12_SCALE                        LIS2DH12_SCALE4G
+#define LIS2DH12_RESOLUTION                   LIS2DH12_RES12BIT
+#define LIS2DH12_SAMPLE_RATE                  LIS2DH12_RATE_10
 
 //#define NRF_LOG_MODULE_NAME "VEML7700"
 #include "nrf_log.h"
@@ -19,7 +26,7 @@ static const nrf_drv_twi_t m_twi = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID);
 /**
  * @brief TWI events handler.
  */
-void twi_veml7700_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
+void twi_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
 {
     //NRF_LOG_INFO("twi_veml7700_handler p_event->type %d\r\n", p_event->type);
     switch (p_event->type)
@@ -31,6 +38,10 @@ void twi_veml7700_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
                 //data_handler(m_sample);
             }
             m_xfer_done = true;
+            if(p_event->xfer_desc.address == LIS2DH12_TWI_ADDR)
+            {
+               lis2dh12_twi_evt_handler(p_event, p_context);
+            }
             break;
         default:
             break;
@@ -40,19 +51,19 @@ void twi_veml7700_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
 /**
  * @brief TWI initialization.
  */
-void veml770_twi_init (void)
+void twi_init (void)
 {
     ret_code_t err_code;
 
-    const nrf_drv_twi_config_t twi_veml7700_config = {
-       .scl                = VEML700_SDL,
-       .sda                = VEML700_SDA,
+    const nrf_drv_twi_config_t twi_config = {
+       .scl                = SCL_PIN,
+       .sda                = SDA_PIN,
        .frequency          = TWI_FREQUENCY_FREQUENCY_K400,
        .interrupt_priority = APP_IRQ_PRIORITY_HIGH,
        .clear_bus_init     = false
     };
 
-    err_code = nrf_drv_twi_init(&m_twi, &twi_veml7700_config, twi_veml7700_handler, NULL);
+    err_code = nrf_drv_twi_init(&m_twi, &twi_config, twi_handler, NULL);
     APP_ERROR_CHECK(err_code);
 
     nrf_drv_twi_enable(&m_twi);
@@ -70,6 +81,20 @@ int veml_config(uint8_t reg, uint8_t reg_lsb, uint8_t reg_msb)
     while (m_xfer_done == false);
     NRF_LOG_INFO("veml_config done\r\n");
     return 0;
+}
+
+/**
+ * @brief LIS2DH12 initialization.
+ */
+void lis2dh12_init(void) {
+    const lis2dh12_twi_config_t lis2dh12_twi_config = {
+            .addr = LIS2DH12_TWI_ADDR,
+            .scale = LIS2DH12_SCALE,
+            .resolution = LIS2DH12_RESOLUTION,
+            .sample_rate = LIS2DH12_SAMPLE_RATE,
+    };
+
+    lis2dh12_twi_init(&m_twi, &lis2dh12_twi_config);
 }
 
 uint16_t veml_read_luminosity(uint8_t reg)
@@ -96,4 +121,39 @@ uint16_t veml_read_luminosity(uint8_t reg)
     result =  (result << 8) + luminosity[0];
     //NRF_LOG_INFO("veml_read_luminosity result %d \r\n", result);
     return result;
+}
+
+
+
+lis2dh12_sensor_buffer_t lis2dh12_data;
+/**
+ * @brief Function for reading acceleration data from LIS2DH12.
+ */
+void log_lis2dh12_sensors(void) //to get the measurement data from lis2dh12 (x,y,z).
+{
+    int lis2dh12_number_of_samples_avg = 2;
+    lis2dh12_sensor_buffer_t raw_data[lis2dh12_number_of_samples_avg]; // array of raw data for averaging, set size to 1 if averaging is not
+    
+    //next few lines are for data averaging on acceleration values.
+    //five samples are taken with a delay of 5 micro seconds.
+    for(int i = 0; i < lis2dh12_number_of_samples_avg; i++)
+    {
+        lis2dh12_twi_measurement_get(&raw_data[i]);
+        nrf_delay_us(5);
+    }
+    
+    lis2dh12_data.sensor.x = 0;    
+    lis2dh12_data.sensor.y = 0;    
+    lis2dh12_data.sensor.z = 0;
+    
+    for(int i = 0; i < lis2dh12_number_of_samples_avg; i++)
+    {
+      lis2dh12_data.sensor.x = lis2dh12_data.sensor.x + raw_data[i].sensor.x;
+      lis2dh12_data.sensor.y = lis2dh12_data.sensor.y + raw_data[i].sensor.y;
+      lis2dh12_data.sensor.z = lis2dh12_data.sensor.z + raw_data[i].sensor.z;
+    }
+    
+    lis2dh12_data.sensor.x = lis2dh12_data.sensor.x/lis2dh12_number_of_samples_avg;    
+    lis2dh12_data.sensor.y = lis2dh12_data.sensor.y/lis2dh12_number_of_samples_avg;    
+    lis2dh12_data.sensor.z = lis2dh12_data.sensor.z/lis2dh12_number_of_samples_avg;
 }

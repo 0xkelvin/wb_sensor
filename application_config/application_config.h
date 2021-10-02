@@ -17,16 +17,19 @@
 // Use nRF5 SDK15
 #define NRF5_SDK15_PLATFORM_ENABLED              1
 
+#define ENABLE_Cal_Gpio_State  NO
+
 // Define for power measurement
 #define YES (1)
 #define NO  (0)
-#define ADVERTISE_WITH_DUMMY_DATA     YES
+#define ADVERTISE_WITH_DUMMY_DATA     NO
 
 #define ENABLE_POWER_SHARING          YES
 
 #if(!ADVERTISE_WITH_DUMMY_DATA)
-#define ADVERTISE_WITH_BME280           YES
-#define ADVERTISE_WITH_VEML6035         YES
+#define ADVERTISE_WITH_ACCELER          YES
+#define ADVERTISE_WITH_BME280           NO
+#define ADVERTISE_WITH_VEML6035         NO
 #else
 #define ADVERTISE_WITH_BME280           NO
 #define ADVERTISE_WITH_VEML6035         NO

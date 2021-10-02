@@ -188,13 +188,18 @@
         recurse="Yes" />
       <file file_name="../../../ruuvi.drivers.c/ruuvi_driver_error.h" />
       <folder Name="STM_drivers">
-        <file file_name="../../../ruuvi.drivers.c/STMems_Standard_C_drivers/lis2dh12_STdC/driver/lis2dh12_reg.c" />
-        <file file_name="../../../ruuvi.drivers.c/STMems_Standard_C_drivers/lis2dh12_STdC/driver/lis2dh12_reg.h" />
+        <file file_name="lis2dh12_reg.c" />
+        <file file_name="lis2dh12_reg.h" />
       </folder>
       <file file_name="../../../ruuvi.drivers.c/README.md" />
       <folder Name="veml7700">
         <file file_name="../../../ruuvi.drivers.c/veml7700/veml7700.c" />
         <file file_name="../../../ruuvi.drivers.c/veml7700/veml7700.h" />
+      </folder>
+      <folder Name="acceler">
+        <file file_name="../../../ruuvi.drivers.c/lis2dh12_driver/lis2dh12_registers.h" />
+        <file file_name="../../../ruuvi.drivers.c/lis2dh12_driver/lis2dh12.c" />
+        <file file_name="../../../ruuvi.drivers.c/lis2dh12_driver/lis2dh12.h" />
       </folder>
       <file file_name="../../../../nRF5_SDK_15.2.0_9412b96/components/boards/boards.c" />
     </folder>
