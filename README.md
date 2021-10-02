@@ -34,6 +34,8 @@ WaveBoost Sensor Board is including :
    
    SDA <--> 8
   
+  UART Tx for log trace : PIN 06
+  
   4 Change the interval advertising: 
    - go to the file application_config.h, and search for the macro : APPLICATION_ADVERTISING_INTERVAL and change its value
    (#define APPLICATION_ADVERTISING_INTERVAL              1010)
