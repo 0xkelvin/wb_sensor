@@ -28,8 +28,8 @@
 
 #if(!ADVERTISE_WITH_DUMMY_DATA)
 #define ADVERTISE_WITH_ACCELER          YES
-#define ADVERTISE_WITH_BME280           NO
-#define ADVERTISE_WITH_VEML6035         NO
+#define ADVERTISE_WITH_BME280           YES
+#define ADVERTISE_WITH_VEML6035         YES
 #else
 #define ADVERTISE_WITH_BME280           NO
 #define ADVERTISE_WITH_VEML6035         NO
