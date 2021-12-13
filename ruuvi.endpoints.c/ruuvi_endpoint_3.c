@@ -75,13 +75,19 @@ ruuvi_endpoint_status_t ruuvi_endpoint_3_encode(uint8_t* const buffer, const ruu
   buffer[RUUVI_ENDPOINT_3_OFFSET_ACCELERATIONZ_MSB] = data->accelerationz_g>>8;
   buffer[RUUVI_ENDPOINT_3_OFFSET_ACCELERATIONZ_LSB] = data->accelerationz_g&0xFF;
   // voltage
+  buffer[RUUVI_ENDPOINT_3_OFFSET_VOLTAGE_MSB] = data->light>>8;
+  buffer[RUUVI_ENDPOINT_3_OFFSET_VOLTAGE_LSB] = data->light&0xFF;
+
+
   uint32_t voltage = (data->battery_v*1000);
   buffer[RUUVI_ENDPOINT_3_OFFSET_SUPERCAP_MSB] = voltage>>8;
   buffer[RUUVI_ENDPOINT_3_OFFSET_SUPERCAP_LSB] = voltage&0xFF;
 
+  ruuvi_endpoint_3_encode_acceleration(&buffer[RUUVI_ENDPOINT_3_OFFSET_REC1_ADC], data->rec1_adc, invalid);
+  ruuvi_endpoint_3_encode_acceleration(&buffer[RUUVI_ENDPOINT_3_OFFSET_REC2_ADC], data->rec2_adc, invalid);
+  ruuvi_endpoint_3_encode_acceleration(&buffer[RUUVI_ENDPOINT_3_OFFSET_PM_ADC], data->pm_adc, invalid);
  
-  buffer[RUUVI_ENDPOINT_3_OFFSET_VOLTAGE_MSB] = data->light>>8;
-  buffer[RUUVI_ENDPOINT_3_OFFSET_VOLTAGE_LSB] = data->light&0xFF;
+ 
   // End
 
   return RUUVI_ENDPOINT_SUCCESS;
